@@ -1,0 +1,30 @@
+{
+  "ver": "1.0.0",
+  "uuid": "6233cd58-8fc3-424c-a63f-2e006cc9d120",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "subMetas": {
+    "img_kapian": {
+      "ver": "1.0.3",
+      "uuid": "c3498ea3-d3e7-49ee-b677-2f7b70089277",
+      "rawTextureUuid": "6233cd58-8fc3-424c-a63f-2e006cc9d120",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 66,
+      "height": 55,
+      "rawWidth": 66,
+      "rawHeight": 55,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

@@ -1,0 +1,129 @@
+import BaseModel from "../../Libs/BaseModel";
+import BaseCtrl from "../../Libs/BaseCtrl";
+import BaseView from "../../Libs/BaseView";
+import UiMgr from "../../GameMgrs/UiMgr";
+
+const {ccclass, property} = cc._decorator;
+let ctrl : Club_AskListCtrl;
+//模型，数据处理
+class Model extends BaseModel{
+	askList:any = [];
+    blackList:any = [];
+	constructor()
+	{
+        super();
+        this.addAskListData()
+        this.addBlackListData()
+	}
+	addAskListData(){
+        var askCount = 10;
+        for(let i = 0; i < askCount; i++){
+            this.askList[i] = {
+                userName : '狗旺旺'+ i,
+                id : i,
+                spHead : '' + i,
+                clubID : '' + i,
+                playerID : '' + i,
+                rank : 0,
+            }
+        }
+    }
+    addBlackListData(){
+        var blackListCount = 7;
+        for(let i = 0; i < blackListCount; i++){
+            this.blackList[i] = {
+                userName : '傻狗' + i,
+                id : i,
+                spHead : '' + i,
+                clubID : '' + i,
+                playerID : '' + i,
+                rank : 0,
+            }
+        }
+    }
+}
+class View extends BaseView{
+    constructor(model){
+        super(model);
+		this.node=ctrl.node;
+        this.initUi();
+    }
+    ui = {
+    	labUserName: ctrl.LabUserName,
+    	btnBlackList: ctrl.BtnBlackList,
+    	btnRefuse: ctrl.BtnRefuse,
+    	btnAgree: ctrl.BtnAgree,
+    },
+    public initUi(){
+    
+    }
+}
+
+@ccclass
+export default class Club_AskListCtrl extends BaseCtrl {
+   @property({
+    	tooltip : '角色名称',
+    	type : cc.Label
+    })
+    LabUserName : cc.Label = null;
+
+    @property({
+    	tooltip : '黑名单按钮',
+    	type : cc.Node
+    })
+    BtnBlackList : cc.Node = null;
+
+    @property({
+    	tooltip : '拒绝按钮',
+    	type : cc.Node
+    })
+    BtnRefuse : cc.Node = null;
+
+    @property({
+    	tooltip : '同意按钮',
+    	type : cc.Node
+    })
+    BtnAgree : cc.Node = null;
+
+    // LIFE-CYCLE CALLBACKS:
+
+    onLoad () {
+    	//创建mvc模式中模型和视图
+		//控制器
+		ctrl = this;
+		//初始化mvc
+		this.initMvc(Model,View);
+    },
+
+    //定义网络事件
+	defineNetEvents () {}
+	//定义全局事件
+	defineGlobalEvents () {}
+	//绑定操作的回调
+    connectUi () {
+        this.connect(G_UiType.button, this.view.ui.btnBlackList, this.addToBlackListCB, '加入黑名单');
+        this.connect(G_UiType.button, this.view.ui.btnRefuse, this.refuseCB, '拒绝玩家');
+        this.connect(G_UiType.button, this.view.ui.btnAgree, this.agreeCB, '接受玩家');
+	}
+
+    start () {
+
+    },
+
+	refuseCB(event){
+    	console.log('拒绝玩家')
+    	event.currentTarget.parent.removeFromParent();
+	}
+
+	agreeCB(event){
+		console.log('接受玩家')
+		event.currentTarget.parent.removeFromParent();
+	}
+
+	addToBlackListCB(event){
+		console.log('加入黑名单')
+		event.currentTarget.parent.removeFromParent();
+	}
+
+    // update (dt) {},
+}

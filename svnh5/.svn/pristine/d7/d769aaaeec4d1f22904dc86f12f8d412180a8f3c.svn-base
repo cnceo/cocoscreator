@@ -1,0 +1,492 @@
+import BaseMgr from "../Libs/BaseMgr";
+import UserMgr from "./UserMgr";
+import BetMgr from "./BetMgr";
+import LoginMgr from "./LoginMgr";
+import VerifyMgr from "./VerifyMgr";
+import CreateRoomMgr from "./CreateRoomMgr";
+import YySdkMgr from "../SdkMgrs/YySdk";
+import FrameMgr from "./FrameMgr";
+
+/**
+ * VerifyMgr
+ * table
+ * g
+ * GameType
+ * gfun
+ * 
+ */
+
+enum G_ROOMSTATE
+{
+    nomal=1, //普通进房
+    fangka,//房卡进房
+    stayinroom,//结算关闭
+    oncemore,//再来一局
+    recover,//游戏恢复
+    owneback, //房主归来
+} 
+window['G_ROOMSTATE']=G_ROOMSTATE; 
+  
+export default class RoomMgr extends BaseMgr{
+    roomstate:G_ROOMSTATE = null
+    roominfo = null
+    roomtype:number = null                        //0表示金币场1表示房卡
+    fangKaCfg=null//房卡配置
+    routes={}
+    //=========
+    password:any = null
+    users={}
+    preparemap={}
+    myseatid:any = null
+    bGameIsStated:Boolean = null
+    rid:any = null  
+    autoPrepare=false;
+    constructor (){
+        super();
+        
+        this.roominfo=null;
+        this.roomtype=0;
+        this.resetData();
+     
+
+        this.routes = {
+            'http.reqCreateFangKaVerify':this.http_reqCreateFangKaVerify,   
+            'onEnterRoom':this.onEnterRoom,
+            'onReEnterRoom':this.onReEnterRoom,
+            'onLeaveRoom':this.onLeaveRoom,
+            'onPrepare':this.onPrepare, 
+            'onSyncData':this.onSyncData,
+            'onStartGame':this.onStartGame,      
+            'http.reqRoomVerify':this.http_reqRoomVerify, 
+            'http.reqRoomEntry':this.http_reqRoomEntry, 
+            'connector.entryHandler.enterRoom':this.connector_entryHandler_enterRoom,
+            'connector.entryHandler.recoverRoom':this.connector_entryHandler_recoverRoom,  
+            'room.roomHandler.nextRound':this.room_roomHandler_nextRound,  
+            'room.roomHandler.reEnterRoom':this.room_roomHandler_reEnterRoom, 
+            'onGameFinished':this.onGameFinished, 
+            'http.reqCreateFangKaRoom':this.http_reqCreateFangKaRoom,
+            'http.reqFangKaEntry':this.http_reqFangKaEntry, 
+            'http.reqFangKaVerify':this.http_reqFangKaVerify,
+            'http.reqRoomInfo':this.http_reqRoomInfo,
+            'http.reqDisbandRoom':this.http_reqDisbandRoom, 
+            'http.reqSettle':this.http_reqSettle,
+            'room.roomHandler.exitRoom':this.room_roomHandler_exitRoom, 
+            'http.reqFangKaCfg':this.http_reqFangKaCfg,
+            'connector.entryHandler.ownerBack':this.connector_entryHandler_ownerBack,
+        }
+    }
+    setAutoPrepare(bPrepare)
+    {
+        this.autoPrepare=bPrepare
+    }
+    //===================所有的请求回调
+    http_reqFangKaEntry(msg)
+    {   
+        if(msg.rid==null)
+        {
+            //如果服务器没下发房间表示已经在房间中了,要重进房间
+            this.roomstate=G_ROOMSTATE.oncemore;
+            this.reEnterRoom();
+        }
+        else
+        {
+            //如果服务器下发了房间id则表示是在房间外，这时候要去进入房间
+            this.roomstate=G_ROOMSTATE.fangka;  
+            this.rid=msg.rid; 
+        }
+
+    }
+
+    ownerBack(){
+        this.send_msg('connector.entryHandler.ownerBack');
+    }
+    http_reqSettle()
+    {
+        this.reqRoomInfo();
+    }
+    waitForRecover(){
+        this.roomstate=G_ROOMSTATE.recover; 
+        this.start_module(G_MODULE.LoadingGame);  
+    }
+    waitForOwnerBack(){
+        this.roomstate=G_ROOMSTATE.owneback; 
+        this.start_module(G_MODULE.LoadingGame);  
+    }
+    http_reqDisbandRoom()
+    {
+    }
+    //获取我的房间状态
+    reqMyRoomState()
+    {
+        this.send_msg('http.reqMyRoomState');//获取我的房间状态
+    }
+    setState(state)
+    {
+        this.roomstate=state;
+    }
+ 
+    reqFangKaEntry()
+    {
+        this.send_msg('http.reqFangKaEntry');//进入房卡房间
+    }
+    http_reqFangKaVerify()
+    {
+        this.reqFangKaEntry()
+    }
+    reqFangKaVerify(password)
+    { 
+        if(password!=null)
+        {
+            this.password=password;
+            let msg={
+                'password':password,
+            }
+            this.send_msg('http.reqFangKaVerify',msg);//进入房卡房间
+        }
+        else{
+            this.send_msg('http.reqFangKaVerify');//房卡房间再来一局
+        }
+    }
+    http_reqFangKaCfg(msg)
+    {
+        this.fangKaCfg=msg.cfg;
+    }
+    reqFangKaCfg(password)
+    {
+        this.password=password;
+        let msg={
+            'password':password,
+        }
+        this.send_msg('http.reqFangKaCfg',msg);//获取房卡配置
+    }
+    resetData()
+    {
+        this.users={};
+        this.preparemap={};
+        this.myseatid=null; 
+        this.bGameIsStated=false;  
+    }
+    onSyncData()
+    {
+        // body
+        this.bGameIsStated=true;
+    }
+ 
+    room_roomHandler_reEnterRoom(msg)
+    {
+        this.updateRoomUsers(msg);
+    }
+    http_reqRoomInfo(msg)
+    {
+        this.roominfo=msg.roominfo;
+        if(msg.roominfo.owner==0){
+            this.roomtype=0
+        }else{
+            this.roomtype=1
+        }
+    }
+    reqRoomInfo()
+    { 
+        this.send_msg('http.reqRoomInfo');//获取房间信息
+    } 
+    //麻将进度
+    onStartGame(msg) 
+    { 
+        this.bGameIsStated=true;  
+    }
+    onGameFinished()
+    {
+        // body
+        this.preparemap={};//重置准备状态
+        this.bGameIsStated=false; 
+    }
+    //返回房间桌面
+    backToRoom()
+    {
+        //回到房间时候本地判断下钱够不够，然后服务器也要继续判断钱够不够
+        this.roomstate=G_ROOMSTATE.stayinroom; 
+        if(this.roomtype==0){  
+            let ret=VerifyMgr.getInstance().checkCoin()  
+            if(ret){
+                this.reEnterRoom();
+            }
+        }else if(this.roomtype==1)
+        {            
+            let ret=VerifyMgr.getInstance().checkFangKaRound(this.roominfo)   
+            if(ret){
+                this.nextRound()
+            } 
+        }
+    }
+    //再来一局
+    onceMore(){
+        //再来一局是本地判断下钱够不够，然后服务器也要继续判断钱够不够
+        this.roomstate=G_ROOMSTATE.oncemore;
+        // body 
+        if(this.roomtype==0){  
+            let ret=VerifyMgr.getInstance().checkCoin()  
+            if(ret){
+                //金币场每次都要服务器验证金币
+                this.reqRoomVerify(true);
+            }
+        }else if(this.roomtype==1){
+            //房卡判断比较复杂要判断条件,在逻辑服判断即可
+            let ret=VerifyMgr.getInstance().checkFangKaRound(this.roominfo)   
+            if(ret){
+                this.nextRound()
+            } 
+        }
+    }
+ 
+    nextRound(){
+        // body  
+        this.send_msg('room.roomHandler.nextRound');
+    }
+    onPrepare(msg)
+    {
+        // body
+        this.preparemap[msg.seatid]=true; 
+    }
+    recoverRoom()
+    {
+        // body  
+        this.send_msg('connector.entryHandler.recoverRoom');
+    }
+    connector_entryHandler_recoverRoom(msg:any)
+    { 
+        this.updateRoomUsers(msg);
+        this.startYaYaSdk();
+        this.reqRoomInfo();   
+    }
+    connector_entryHandler_ownerBack(msg:any)
+    { 
+        this.updateRoomUsers(msg);
+        this.startYaYaSdk();
+        this.reqRoomInfo(); 
+    }
+    prepare()
+    {
+        // body 
+        this.notify_msg('room.roomHandler.prepare',null);
+    }
+    onEnterRoom(msg) 
+    {
+        let uid=msg.user;
+        this.users[msg.seatid]=uid     
+        UserMgr.getInstance().reqUsers([uid]);
+    }
+    onReEnterRoom(msg)
+    {
+        let uid=msg.user;
+        this.users[msg.seatid]=uid
+        UserMgr.getInstance().reqUsers([uid]);
+    }
+
+    onLeaveRoom(msg)
+    {
+        delete this.users[msg.seatid]
+        delete this.preparemap[msg.seatid] 
+    }
+    
+    updateRoomUsers(msg)
+    { 
+        this.resetData();
+        // body 
+        var uids=[]
+        for(let key in msg.seats)
+        {
+            let seatid=parseInt(key);
+            let uid=msg.seats[key];
+            if(uid!=null)
+            {
+                this.users[seatid]=uid;
+                this.preparemap[seatid]=msg.prepares[key];
+                uids.push(uid)
+            }
+        } 
+        // 设置我的seatid
+        var myuid= LoginMgr.getInstance().getUid() 
+        for(var logicseatid in this.users)
+        { 
+            var  uid = this.users[logicseatid] 
+            if (uid && myuid== uid )  
+            {
+                this.myseatid=parseInt(logicseatid); 
+                break;
+            } 
+        }
+        UserMgr.getInstance().reqUsers(uids);
+        //判断房间状态自动准备
+		switch(this.roomstate)
+		{
+			case G_ROOMSTATE.nomal:
+            case G_ROOMSTATE.oncemore: 
+                this.prepare();//
+            break;
+            case G_ROOMSTATE.recover:
+                this.syncData();//同步数据
+            break;
+        }  
+        G_FRAME.globalEmitter.emit('usersUpdated')//发送全局事件让模块刷新自己的房间内用户
+    }
+     
+    syncData(  )
+    {
+        // body
+        this.notify_msg('room.roomHandler.syncData',null)
+    } 
+    getMySeatId()
+    {
+        // body
+        return this.myseatid;
+    }
+    reqDisbandRoom()
+    {
+        // body
+        this.send_msg('http.reqDisbandRoom');
+    }
+    exitRoom()
+    {
+        // body
+        this.send_msg('room.roomHandler.exitRoom');
+    } 
+    room_roomHandler_exitRoom(){
+        YySdkMgr.getInstance().LeaveRoom();
+    }
+    getLogicSeatId(target_seatid)
+    {  
+        let logicseatid = (target_seatid + this.myseatid)%4;
+         
+        return logicseatid;
+    }
+
+    getViewSeatId(logicSeatId)
+    {
+        // body
+        let viewseatid = (logicSeatId-this.myseatid+4)%4; 
+        return viewseatid;
+    }
+
+    //参数bInRoom表示是否在房间中
+    reqRoomVerify(bInRoom) 
+    {  
+        if(bInRoom)
+        {
+            //如果在房间中则直接发送
+            this.send_msg('http.reqRoomVerify');
+        }
+        else
+        {
+            //如果是房间外则要提交游戏id和底注类型 
+            let msg={
+                'gameid':BetMgr.getInstance().getGameId(),
+                'bettype':BetMgr.getInstance().getBetType(), 
+            }
+            this.send_msg('http.reqRoomVerify',msg);
+        }
+    }
+    http_reqRoomVerify(msg)
+    {
+        //表示再来一局验证通过,则直接走重进房间
+        if(msg.oncemore==true)
+        { 
+            this.reEnterRoom();
+        }
+        else
+        {
+            this.reqRoomEntry()
+            
+        }
+    }
+    reqRoomEntry()
+    {
+        this.send_msg('http.reqRoomEntry');
+    } 
+
+ 
+ 
+ 
+
+    http_reqCreateFangKaRoom(msg)
+    {
+        //获得web服务器上房间分配后,就进入pomelo服务器 
+        this.roomstate=G_ROOMSTATE.fangka;  
+        this.rid=msg.rid; 
+    }
+ 
+    //匹配房间的验证接口
+    http_reqRoomEntry(msg)
+    {  
+        this.roomstate=G_ROOMSTATE.nomal;  
+        this.rid=msg.rid; 
+        
+    }
+    reEnterRoom()
+    {
+        // body
+        this.send_msg('room.roomHandler.reEnterRoom');
+    }
+    enterRoom()
+    {
+        // body
+        this.send_msg('connector.entryHandler.enterRoom');
+    }
+    
+    connector_entryHandler_enterRoom(msg)
+    {    
+        this.updateRoomUsers(msg); 
+        this.startYaYaSdk();
+        this.reqRoomInfo(); 
+    }
+ 
+    room_roomHandler_nextRound(msg)
+    {
+        this.updateRoomUsers(msg); 
+        this.startYaYaSdk();
+        this.reqRoomInfo(); 
+    }
+    reqCreateFangKaRoom()
+    {
+        //创建房卡房间
+        this.send_msg('http.reqCreateFangKaRoom') 
+    }
+
+    http_reqCreateFangKaVerify(msg)
+    {
+        //收到保存成功后就刷新最新的设置  
+        this.reqCreateFangKaRoom(); 
+    } 
+    reqCreateFangKaVerify()
+    {  
+        var gameid = BetMgr.getInstance().getGameId()
+        var roomRuleInfo = CreateRoomMgr.getInstance().getRoomRuleInfo(gameid)
+        var ret=VerifyMgr.getInstance().checkFangKa(roomRuleInfo.b_fangfei);
+        if(!ret){
+            console.log('啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊，您的房卡不足啦啦啦')
+            return
+        }
+        var msg={
+            'gameid': gameid,
+            'roomvalue': roomRuleInfo
+        }
+        console.log('创建包厢上传数据', msg)
+        let gameRuleNameList = [null, "qzmjRoomRuleInfoGroups", "nnRoomRuleInfoGroups"];
+        let gameRuleName = gameRuleNameList[gameid];
+        let roomRuleInfoGroups = CreateRoomMgr.getInstance().getInfoGroups(gameid)
+        roomRuleInfoGroups[LoginMgr.getInstance().getUid().toString()] = roomRuleInfo;
+        cc.sys.localStorage.setItem(gameRuleName, JSON.stringify(roomRuleInfoGroups));
+        this.send_msg('http.reqCreateFangKaVerify',msg)  
+    }
+    startYaYaSdk () {
+		let userinfo = UserMgr.getInstance().getMyInfo();
+		YySdkMgr.getInstance().InitYaYaSdk(userinfo.id, userinfo.nickname, this.rid);
+    }
+    //单例处理
+    private static _instance:RoomMgr
+    public static getInstance ():RoomMgr{
+        if(!this._instance){
+            this._instance = new RoomMgr();
+        }
+        return this._instance;
+    }
+}

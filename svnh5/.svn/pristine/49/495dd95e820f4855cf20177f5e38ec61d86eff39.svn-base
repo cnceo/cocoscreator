@@ -1,0 +1,281 @@
+import BaseCtrl from "../../Libs/BaseCtrl";
+import BaseView from "../../Libs/BaseView";
+import BaseModel from "../../Libs/BaseModel";
+import CreateRoomMgr from "../../GameMgrs/CreateRoomMgr";
+import BetMgr from "../../GameMgrs/BetMgr";
+
+const {ccclass, property} = cc._decorator;
+let ctrl : Prefab_CreateQzmj;
+
+class Model extends BaseModel{
+	roomRuleInfo : any = {}
+	jinLimitInfo : string = []
+	gameid : any = {}
+	roomcfg : any = []
+	constructor()
+	{
+        super();
+        this.gameid = BetMgr.getInstance().getGameId();
+        console.log('gameId', this.gameid)
+        this.roomRuleInfo = CreateRoomMgr.getInstance().getRoomRuleInfo(this.gameid)
+        this.roomcfg={
+        	v_roundcount:[8,16,99],
+        	v_seatcount:[4,3,2],
+        	b_fangfei:[0,1,2],
+        	b_youjin:[0,1],
+        	t_youjin:[3,4]
+        }
+        this.jinLimitInfo = ['单金可平胡，双金可平胡', '单金可平胡，双金至少自摸', '单金至少自摸，双金至少游金', '单金至少游金']
+	}
+}
+
+class View extends BaseView{
+    constructor(model){
+        super(model);
+		this.node=ctrl.node;
+        this.initUi();
+    }
+    ui = {
+    	nodePage1: ctrl.Page1,
+    	nodePage2: ctrl.Page2,
+    	nodePayment: ctrl.PaymentToggleGroup,
+    	nodeBaseScore: ctrl.BaseScoreGroup,
+    	YoujinAward: ctrl.YoujinAward,
+    	AllWinAward: ctrl.AllWinAward,
+    	nodejinLimit: ctrl.JinLimit,
+    	jinLimitDropDown: ctrl.JinLimitDropDown,
+    	suggest: ctrl.Suggest,
+        dropUP: ctrl.DropUP,
+    },
+    public initUi(){
+    	console.log('开房数据', this.model.roomRuleInfo)
+    	this.initPage1();
+    	this.initPage2();  	
+    }
+    initCheckState(groupChildren, toggleName) {
+    	let data = this.model.roomcfg[toggleName];
+    	let value = this.model.roomRuleInfo[toggleName];
+    	for (let i=0; i<data.length; i++) {
+    		if (data[i]==value) {
+    			groupChildren[i].getComponent(cc.Toggle).check()
+    		}
+    	}
+    }
+    initPage1(){
+    	//page1
+    	let groups = this.ui.nodePage1.children;
+    	for(let i = 0; i<groups.length; i++){
+    		let groupChildren = groups[i].getChildByName('ToggleContainer').children;
+    		for(let j = 0; j<groupChildren.length; j++) {
+    			this.initCheckState(groupChildren, groups[i].name)
+    		}
+    	}
+    }
+    initPage2(){
+    	let paymentName = this.model.roomRuleInfo.b_hupai.toString()
+    	let baseScoreName = this.model.roomRuleInfo.v_difen.toString()
+    	this.ui.nodePayment.getChildByName(paymentName).getComponent(cc.Toggle).check()
+    	this.ui.nodeBaseScore.getChildByName(baseScoreName).getComponent(cc.Toggle).check()
+    	this.ui.YoujinAward.getComponent(cc.EditBox).string = this.model.roomRuleInfo.v_youjinjiangli.toString();
+    	this.ui.AllWinAward.getComponent(cc.EditBox).string = this.model.roomRuleInfo.v_shasanjiangli.toString();
+    	this.ui.nodejinLimit.getComponentInChildren(cc.Label).string = this.model.jinLimitInfo[this.model.roomRuleInfo.b_jinxianzhi];
+    }
+}
+
+@ccclass
+export default class Prefab_CreateQzmj extends BaseCtrl {
+
+    @property({
+    	tooltip : 'page1',
+    	type : cc.Node
+    })
+    Page1: cc.Node = null;
+
+    @property({
+    	tooltip : '赔付按钮组',
+    	type : cc.Node
+    })
+    PaymentToggleGroup: cc.Node = null;
+
+    @property({
+    	tooltip : '底分',
+    	type : cc.Node
+    })
+    BaseScoreGroup: cc.Node = null;
+
+    @property({
+    	tooltip : '游金奖励',
+    	type : cc.Node
+    })
+    YoujinAward: cc.Node = null;
+
+    @property({
+    	tooltip : '杀三奖励',
+    	type : cc.Node
+    })
+    AllWinAward: cc.Node = null;
+
+    @property({
+    	tooltip : '有金显示下拉选项',
+    	type : cc.Node
+    })
+    JinLimit: cc.Node = null;
+
+    @property({
+    	tooltip : '下拉界面',
+    	type : cc.Node
+    })
+    JinLimitDropDown: cc.Node = null;
+
+    @property({
+    	tooltip : '更多建议',
+    	type : cc.Node
+    })
+    Suggest: cc.Node = null;
+
+    @property({
+        tooltip : '下拉收起按钮',
+        type : cc.Node
+    })
+    DropUP: cc.Node = null;
+
+    // LIFE-CYCLE CALLBACKS:
+
+    onLoad () {
+    	//创建mvc模式中模型和视图
+		//控制器
+		ctrl = this;
+		//初始化mvc
+		this.initMvc(Model,View);
+    },
+    //定义网络事件
+	defineNetEvents () {}
+	//定义全局事件
+	defineGlobalEvents () {}
+	//绑定操作的回调
+    connectUi () {
+    	let groups = this.view.ui.nodePage1.children;
+    	for(let i = 0; i<groups.length; i++){
+    		let groupChildren = groups[i].getChildByName('ToggleContainer').children;
+    		for(let j = 0; j<groupChildren.length; j++){
+    			let callback = null;
+    			if (groups[i].name == "v_roundcount") callback = this.gameCountCB
+    			else if (groups[i].name == "v_seatcount") callback = this.playerCountCB
+    			else if (groups[i].name == "b_fangfei") callback = this.payTypeCB
+    			else if (groups[i].name == "b_youjin") callback = this.youjinTypeCB
+    			else if (groups[i].name == "t_youjin") callback = this.timesCB
+    			this.connect(G_UiType.toggle, groupChildren[j], callback, 'page1第'+i+'行第'+j+'个')
+    		}
+    	}
+    	this.connect(G_UiType.edit, this.view.ui.YoujinAward, this.youjinAwardEditCB, '游金奖励');
+    	this.connect(G_UiType.edit, this.view.ui.AllWinAward, this.allWinAwardEditCB, '杀三奖励');
+    	this.connect(G_UiType.button, this.view.ui.nodejinLimit, this.DropDownCB, '下拉');
+    	this.connect(G_UiType.button, this.view.ui.suggest, this.suggestCB, '更多建议');
+    	let paymentChildren = this.view.ui.nodePayment.children
+    	for(let i = 0; i < paymentChildren.length; i++){
+    		this.connect(G_UiType.toggle, paymentChildren[i], this.paymentCB, '赔付规则')
+    	}
+    	let baseScoreChildren = this.view.ui.nodeBaseScore.children
+    	for(let i = 0; i < baseScoreChildren.length; i++){
+    		this.connect(G_UiType.toggle, baseScoreChildren[i], this.baseScoreCB, '基础底分')
+    	}
+    	let items = this.view.ui.jinLimitDropDown.getChildByName('dropDownGroup').children
+    	for(let i = 0; i < items.length; i++){
+    		this.connect(G_UiType.toggle, items[i], this.dropDownChooseCB, '选择选项'+ i);
+    	}
+        this.connect(G_UiType.button, this.view.ui.dropUP, this.dropUpCB, '收起下拉框')  
+	}
+
+    start () {
+
+    },
+
+    gameCountCB(event) {
+    	let index = Number(event.currentTarget.name-1)
+    	let value = this.model.roomcfg['v_roundcount'][index]
+    	this.model.roomRuleInfo.v_roundcount = value;
+    	CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 'v_roundcount')
+    	console.log(this.model.roomRuleInfo.v_roundcount)
+    },
+    playerCountCB(event){
+    	let index = Number(event.currentTarget.name-1)
+    	let value = this.model.roomcfg['v_seatcount'][index]
+    	this.model.roomRuleInfo.v_seatcount = value;
+    	CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 'v_seatcount')
+    	console.log(this.model.roomRuleInfo.v_seatcount)
+    },
+    payTypeCB(event){
+    	let index = Number(event.currentTarget.name-1)
+    	let value = this.model.roomcfg['b_fangfei'][index]
+    	this.model.roomRuleInfo.b_fangfei = value;
+    	CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 'b_fangfei')
+    	console.log(this.model.roomRuleInfo.b_fangfei)
+    },
+    youjinTypeCB(event){
+    	let index = Number(event.currentTarget.name-1)
+    	let value = this.model.roomcfg['b_youjin'][index]
+    	this.model.roomRuleInfo.b_youjin = value;
+    	CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 'b_youjin')
+    	console.log(this.model.roomRuleInfo.b_youjin)
+    },
+    timesCB(event){
+    	let index = Number(event.currentTarget.name-1)
+    	let value = this.model.roomcfg['t_youjin'][index]
+    	this.model.roomRuleInfo.t_youjin = value;
+    	CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 't_youjin')
+    	console.log(this.model.roomRuleInfo.t_youjin)
+    },
+    youjinAwardEditCB(type, event){
+    	if(type == 'editing-did-ended'){
+    		let value = Number(event.currentTarget.getComponent(cc.EditBox).string);
+    		this.model.roomRuleInfo.v_youjinjiangli = value;
+    		CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 'v_youjinjiangli')
+    		console.log(this.model.roomRuleInfo.v_youjinjiangli)
+    	}
+    },
+    allWinAwardEditCB(type, event){
+    	if(type == 'editing-did-ended'){
+    		let value = Number(event.currentTarget.getComponent(cc.EditBox).string);
+    		this.model.roomRuleInfo.v_shasanjiangli = value;
+    		CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 'v_shasanjiangli')
+    		console.log(this.model.roomRuleInfo.v_shasanjiangli)
+    	}	
+    },
+    DropDownCB(event){
+    	let bShow = this.view.ui.jinLimitDropDown.active;
+    	this.view.ui.jinLimitDropDown.active = !bShow;
+    },
+
+    paymentCB(event){
+		let value = Number(event.currentTarget.name)
+    	this.model.roomRuleInfo.b_hupai = value;
+    	CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 'b_hupai')
+    	console.log(this.model.roomRuleInfo.b_hupai)
+    }
+
+    baseScoreCB(event){
+    	let value = Number(event.currentTarget.name)
+    	this.model.roomRuleInfo.v_difen = value;
+    	CreateRoomMgr.getInstance().setProperty(value, 'qzmjRoomRuleInfo', 'v_difen')
+    	console.log(this.model.roomRuleInfo.v_difen)
+    }
+
+    dropDownChooseCB(event){
+    	console.log(event)
+    	let index = Number(event.currentTarget.name);
+    	this.ui.nodejinLimit.getComponentInChildren(cc.Label).string = this.model.jinLimitInfo[index];
+    	this.model.roomRuleInfo.b_jinxianzhi = index
+    	CreateRoomMgr.getInstance().setProperty(index, 'qzmjRoomRuleInfo', 'b_jinxianzhi')
+    	this.view.ui.jinLimitDropDown.active = false;
+    	console.log(this.model.roomRuleInfo.b_jinxianzhi)
+    },
+    dropUpCB(event){
+       this.view.ui.jinLimitDropDown.active = false; 
+    }
+    suggestCB(event){
+		console.log("建议界面")
+		this.start_sub_module(G_MODULE.MoreRuleSuggestion);
+    },
+
+    // update (dt) {},
+}

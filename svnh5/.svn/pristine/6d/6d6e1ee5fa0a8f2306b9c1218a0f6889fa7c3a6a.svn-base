@@ -1,0 +1,25 @@
+import ModuleMgr from "../../Plat/GameMgrs/ModuleMgr";
+
+let modules={
+    
+    BullRoom:'TbnnRoom', 
+    Bull_calculate:"SubLayer/Games/Bull/Prefab_bull_calculateCtrl",
+    Bull_settle:"SubLayer/Games/Bull/Prefab_bull_settleCtrl",
+}
+
+export default class TbnnEntry{ 
+    constructor()
+    { 
+    }  
+    private static _instance:TbnnEntry;
+    public static getInstance ():TbnnEntry{
+        if(!this._instance){
+            this._instance = new TbnnEntry();
+        }
+        return this._instance;
+    } 
+    registerModules()
+    {
+        ModuleMgr.getInstance().registerGame(modules);
+    }
+}

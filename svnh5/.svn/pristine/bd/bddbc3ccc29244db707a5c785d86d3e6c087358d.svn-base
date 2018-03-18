@@ -1,0 +1,16 @@
+[
+  {"id":1,"name":"钻石","oprice":6,"price":6,"cate":1,"soldable":1,"amount":60,"explain":"光芒闪耀的钻石"},
+  {"id":2,"name":"钻石","oprice":12,"price":12,"cate":1,"soldable":1,"amount":120,"explain":"光芒闪耀的钻石"},
+  {"id":3,"name":"钻石","oprice":30,"price":30,"cate":1,"soldable":1,"amount":300,"explain":"光芒闪耀的钻石"},
+  {"id":4,"name":"钻石","oprice":68,"price":68,"cate":1,"soldable":1,"amount":680,"explain":"光芒闪耀的钻石"},
+  {"id":5,"name":"钻石","oprice":128,"price":128,"cate":1,"soldable":1,"amount":1280,"explain":"光芒闪耀的钻石"},
+  {"id":6,"name":"钻石","oprice":328,"price":328,"cate":1,"soldable":1,"amount":3280,"explain":"光芒闪耀的钻石"},
+  {"id":7,"name":"钻石","oprice":648,"price":648,"cate":1,"soldable":1,"amount":6480,"explain":"光芒闪耀的钻石"},
+  {"id":100,"name":"兑换券","oprice":0,"price":0,"cate":2,"soldable":0,"amount":1,"explain":"用于在商城中兑换实物道具"},
+  {"id":101,"name":"1元红包券","oprice":0,"price":0,"cate":3,"soldable":0,"amount":1,"explain":"红包券可累积"},
+  {"id":201,"name":"2元话费券","oprice":0,"price":0,"cate":4,"soldable":0,"amount":1,"explain":"累积到一定数额可兑换花费"},
+  {"id":202,"name":"5元话费券","oprice":0,"price":0,"cate":4,"soldable":0,"amount":1,"explain":"累积到一定数额可兑换花费"},
+  {"id":203,"name":"10元话费券","oprice":0,"price":0,"cate":4,"soldable":0,"amount":1,"explain":"累积到一定数额可兑换花费"},
+  {"id":204,"name":"20元话费券","oprice":0,"price":0,"cate":4,"soldable":0,"amount":1,"explain":"累积到一定数额可兑换花费"},
+  {"id":205,"name":"50元话费券","oprice":0,"price":0,"cate":4,"soldable":0,"amount":1,"explain":"累积到一定数额可兑换花费"}
+]

@@ -1,0 +1,96 @@
+/*
+author: YOYO
+日期:2018-02-23 19:23:31
+*/
+import BaseModel from "../../../Plat/Libs/BaseModel";
+import BaseView from "../../../Plat/Libs/BaseView";
+import BaseCtrl from "../../../Plat/Libs/BaseCtrl";
+import RoomMgr from "../../../Plat/GameMgrs/RoomMgr";
+
+//MVC模块,
+const {ccclass, property} = cc._decorator;
+let ctrl : Prefab_bull_settleCtrl;
+//模型，数据处理
+class Model extends BaseModel{
+	constructor()
+	{
+		super();
+
+	}
+}
+//视图, 界面显示或动画，在这里完成
+class View extends BaseView{
+	ui={
+        //在这里声明ui
+        lab_content:null
+	};
+	node=null;
+	constructor(model){
+		super(model);
+		this.node=ctrl.node;
+		this.initUi();
+	}
+	//初始化ui
+	initUi()
+	{
+        this.ui.lab_content = ctrl.lab_content;
+    }
+    //
+    setContent(content:string){
+        this.ui.lab_content.string = content;
+    }
+}
+//c, 控制
+@ccclass
+export default class Prefab_bull_settleCtrl extends BaseCtrl {
+	//这边去声明ui组件
+    @property(cc.Label)
+    lab_content:cc.Label = null
+	//声明ui组件end
+	//这是ui组件的map,将ui和控制器或试图普通变量分离
+
+	onLoad (){
+		//创建mvc模式中模型和视图
+		//控制器
+		ctrl = this;
+		//数据模型
+		this.initMvc(Model,View);
+	}
+
+	//定义网络事件
+	defineNetEvents()
+	{
+        
+	}
+	//定义全局事件
+	defineGlobalEvents()
+	{
+
+	}
+	//绑定操作的回调
+	connectUi()
+	{
+        this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchGray, this);
+	}
+	start () {
+        // RoomMgr.getInstance().backToRoom();
+	}
+    //网络事件回调begin
+	//end
+	//全局事件回调begin
+	//end
+    //按钮或任何控件操作的回调begin
+    private onTouchGray (){
+        this.finish();
+
+        RoomMgr.getInstance().onceMore();
+    }
+    //end
+    
+    showWin(){
+        this.view.setContent('win');
+    }
+    showFail(){
+        this.view.setContent('fail');
+    }
+}

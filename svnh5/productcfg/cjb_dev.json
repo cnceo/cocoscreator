@@ -1,0 +1,8 @@
+{
+    "gameSvrTag": "cj_dev", 
+    "hotUrl": "http://192.168.1.241:2018/majhong", 
+    "payMode": 0, 
+    "payTest": 0, 
+    "platSvrHost": "192.168.1.166", 
+    "platSvrPort": 80
+}

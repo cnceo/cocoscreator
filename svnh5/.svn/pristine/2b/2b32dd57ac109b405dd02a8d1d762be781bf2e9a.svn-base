@@ -1,0 +1,41 @@
+import BaseCfg from "../Libs/BaseCfg";
+
+export default class GoodsCfg extends BaseCfg{
+  
+    //单例处理
+	private goodsPath=null; 
+
+	constructor(){
+		super();
+		this.goodsPath=this.getFullPath('goods');
+	}
+	
+    private static _instance:GoodsCfg; 
+    public static getInstance ():GoodsCfg{
+        if(!this._instance){
+            this._instance = new GoodsCfg();
+        }
+        return this._instance;
+	} 
+	loadCb(name,data){   
+		this.loaded=true;
+	}
+	load()
+	{ 
+     	//先去判断有几个游戏要加载 
+		this.loadRes(this.goodsPath,this.loadCb);
+	}
+	getCoinCfg()
+	{
+		 
+	}
+	getFangKaCfg()
+	{
+		 
+	}
+	getGoldCfg()
+	{
+		 
+	}
+}
+

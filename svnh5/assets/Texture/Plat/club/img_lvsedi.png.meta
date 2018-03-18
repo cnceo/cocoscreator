@@ -1,0 +1,30 @@
+{
+  "ver": "1.0.0",
+  "uuid": "5576d65f-4106-4126-ad61-ff5f0aa54776",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "subMetas": {
+    "img_lvsedi": {
+      "ver": "1.0.3",
+      "uuid": "6482fb83-e431-42f3-aa50-be73fe1a4e77",
+      "rawTextureUuid": "5576d65f-4106-4126-ad61-ff5f0aa54776",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 345,
+      "height": 454,
+      "rawWidth": 345,
+      "rawHeight": 454,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

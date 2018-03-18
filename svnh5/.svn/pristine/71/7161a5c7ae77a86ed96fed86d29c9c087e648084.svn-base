@@ -1,0 +1,8 @@
+# pack-refs with: peeled fully-peeled 
+9077a3fd6df07eb474ae8bfaa187085b984caf2b refs/remotes/origin/Ubuntu-x86_64
+ed8f71410317184857e97e1c30ffce8d2ed459e9 refs/remotes/origin/Windows-x86
+16f8aafb4e7f15a657f41052c048db510eba8348 refs/remotes/origin/master
+2ae83e56f21e2f26418ef5448e6b9a25a42e7774 refs/remotes/origin/upstream
+2c1bf5b0ecd60bc0a657c422c313ff1c66b77a15 refs/tags/5.1
+9077a3fd6df07eb474ae8bfaa187085b984caf2b refs/tags/5.1-Ubuntu-x86_64
+ed8f71410317184857e97e1c30ffce8d2ed459e9 refs/tags/5.1-Windows-x86

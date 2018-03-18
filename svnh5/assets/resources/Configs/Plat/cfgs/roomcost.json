@@ -1,0 +1,31 @@
+{
+  "qzmj":[
+    {"id":1,"type":0,"playercount":4,"roundcount":8,"special":0,"price":30},
+    {"id":2,"type":0,"playercount":3,"roundcount":8,"special":0,"price":22},
+    {"id":3,"type":0,"playercount":2,"roundcount":8,"special":0,"price":15},
+    {"id":4,"type":0,"playercount":4,"roundcount":16,"special":0,"price":57},
+    {"id":5,"type":0,"playercount":3,"roundcount":16,"special":0,"price":42},
+    {"id":6,"type":0,"playercount":2,"roundcount":16,"special":0,"price":28},
+    {"id":7,"type":1,"playercount":4,"roundcount":8,"special":0,"price":8},
+    {"id":8,"type":1,"playercount":3,"roundcount":8,"special":0,"price":8},
+    {"id":9,"type":1,"playercount":2,"roundcount":8,"special":0,"price":8},
+    {"id":10,"type":1,"playercount":4,"roundcount":16,"special":0,"price":15},
+    {"id":11,"type":1,"playercount":3,"roundcount":16,"special":0,"price":15},
+    {"id":12,"type":1,"playercount":2,"roundcount":16,"special":0,"price":15},
+    {"id":13,"type":2,"playercount":4,"roundcount":8,"special":0,"price":30},
+    {"id":14,"type":2,"playercount":3,"roundcount":8,"special":0,"price":22},
+    {"id":15,"type":2,"playercount":2,"roundcount":8,"special":0,"price":15},
+    {"id":16,"type":2,"playercount":4,"roundcount":16,"special":0,"price":57},
+    {"id":17,"type":2,"playercount":3,"roundcount":16,"special":0,"price":42},
+    {"id":18,"type":2,"playercount":2,"roundcount":16,"special":0,"price":28},
+    {"id":19,"type":0,"playercount":4,"roundcount":0,"special":1,"price":35},
+    {"id":20,"type":1,"playercount":4,"roundcount":0,"special":1,"price":10},
+    {"id":21,"type":2,"playercount":4,"roundcount":0,"special":1,"price":35},
+    {"id":22,"type":0,"playercount":3,"roundcount":0,"special":1,"price":26},
+    {"id":23,"type":1,"playercount":3,"roundcount":0,"special":1,"price":10},
+    {"id":24,"type":2,"playercount":3,"roundcount":0,"special":1,"price":26},
+    {"id":25,"type":0,"playercount":2,"roundcount":0,"special":1,"price":18},
+    {"id":26,"type":1,"playercount":2,"roundcount":0,"special":1,"price":10},
+    {"id":27,"type":2,"playercount":2,"roundcount":0,"special":1,"price":18}
+  ]
+}

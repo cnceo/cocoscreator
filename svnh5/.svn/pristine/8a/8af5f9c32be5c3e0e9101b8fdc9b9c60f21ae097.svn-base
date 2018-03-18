@@ -1,0 +1,216 @@
+  
+var QgmjDef={
+};
+//手牌数量 
+QgmjDef.cardcount=16;
+QgmjDef.huacount=8;
+//gm操作
+QgmjDef.gmop_changecard			=1;//gm换牌
+QgmjDef.gmop_changewallorder	=2;//gm更换牌墙顺序
+QgmjDef.gmreq_cards				=1;//gm请求牌型
+
+//插水操作
+QgmjDef.insertWater_null        =0;//不买
+QgmjDef.insertWater_one         =2;//插2水
+QgmjDef.insertWater_two         =3;//插3水
+QgmjDef.insertWater_three       =5;//插5水
+
+//游金状态
+QgmjDef.youjinstate_null		=0;//单游
+QgmjDef.youjinstate_danyou		=1;//单游
+QgmjDef.youjinstate_shuangyou	=2;//单游
+QgmjDef.youjinstate_sanyou		=3;//单游
+
+QgmjDef.state_idle		=1;//等待状态
+QgmjDef.state_chupai	=2;//出牌状态
+QgmjDef.state_event		=3;//事件状态
+
+QgmjDef.process_ready       =1;//准备
+QgmjDef.process_callscore   =2;//插水
+QgmjDef.process_dingzhuang  =3;//定桩
+QgmjDef.process_fapai       =4;//发牌
+QgmjDef.process_buhua       =5;//补花
+QgmjDef.process_kaijin      =6;//开金 
+QgmjDef.process_loop        =7;//牌局循环 
+QgmjDef.process_gamesettle  =8;//游戏结算
+
+//服务器检测各种时间的等级
+//操作优先级从小到大 
+QgmjDef.event_chupai		=1;//出牌
+QgmjDef.event_chi			=2;//检测吃  
+QgmjDef.event_peng			=3;//检测碰
+QgmjDef.event_gang			=4;//检测杠
+QgmjDef.event_angang		=5;//检测暗杠
+QgmjDef.event_bugang		=6;//检测补杠
+QgmjDef.event_zimo			=7;//检测自摸
+QgmjDef.event_sanjindao		=8;//三金倒  
+QgmjDef.event_hu			=9;//检测胡
+QgmjDef.event_qianggang_hu	=10;//抢杠胡
+QgmjDef.event_danyou		=11;//单游
+QgmjDef.event_shuangyou		=12;//双游
+QgmjDef.event_sanyou		=13;//三游
+QgmjDef.event_bazhanghua	=14;//八张花
+
+//玩家操作
+QgmjDef.op_hu			=1;//胡 
+QgmjDef.op_angang		=2;//暗杠
+QgmjDef.op_gang			=3;//杠
+QgmjDef.op_peng			=4;//碰
+QgmjDef.op_chi			=5;//吃
+QgmjDef.op_chupai		=6;//出牌
+QgmjDef.op_bugang		=7;//补牌 
+QgmjDef.op_zimo			=9;//自摸
+QgmjDef.op_sanjindao	=11;//三金倒
+QgmjDef.op_qianggang_hu	=12;//抢杠胡
+QgmjDef.op_danyou		=13;//游金
+QgmjDef.op_shuangyou	=14;//双游
+QgmjDef.op_sanyou		=15;//三游
+QgmjDef.op_bazhanghua	=16;//八张花
+QgmjDef.op_cancel		=20;//取消
+
+//客户端通知事件
+QgmjDef.onOp			='onOp';			//操作通知
+QgmjDef.onSeatChange	='onSeatChange';	//牌权改变通知
+QgmjDef.onEvent			='onEvent';			//牌事件通知
+QgmjDef.onProcess		='onProcess';		//进度通知 
+QgmjDef.onSyncData		='onSyncData';		//同步数据
+QgmjDef.onDeposit		='onDeposit';		//托管
+QgmjDef.onGmOp			='onGmOp';			//gm操作通知
+
+QgmjDef.op_cfg={}
+QgmjDef.op_cfg[QgmjDef.event_hu]			=QgmjDef.op_hu;
+QgmjDef.op_cfg[QgmjDef.event_angang]		=QgmjDef.op_angang;
+QgmjDef.op_cfg[QgmjDef.event_bugang]		=QgmjDef.op_bugang;
+QgmjDef.op_cfg[QgmjDef.event_gang]			=QgmjDef.op_gang;
+QgmjDef.op_cfg[QgmjDef.event_peng]			=QgmjDef.op_peng;
+QgmjDef.op_cfg[QgmjDef.event_chi]			=QgmjDef.op_chi;
+QgmjDef.op_cfg[QgmjDef.event_zimo]			=QgmjDef.op_zimo;
+QgmjDef.op_cfg[QgmjDef.event_chupai]		=QgmjDef.op_chupai;
+QgmjDef.op_cfg[QgmjDef.event_sanjindao]		=QgmjDef.op_hu;
+QgmjDef.op_cfg[QgmjDef.event_qianggang_hu]	=QgmjDef.op_qianggang_hu;
+QgmjDef.op_cfg[QgmjDef.event_danyou]		=QgmjDef.op_danyou; 
+QgmjDef.op_cfg[QgmjDef.event_shuangyou]		=QgmjDef.op_shuangyou;
+QgmjDef.op_cfg[QgmjDef.event_sanyou]		=QgmjDef.op_sanyou;
+QgmjDef.op_cfg[QgmjDef.event_bazhanghua]	=QgmjDef.op_bazhanghua;
+
+//按胡牌的时机 
+QgmjDef.hutime_zimo			=5;//自摸
+QgmjDef.hutime_danyou		=6;//单游
+QgmjDef.hutime_shuangyou	=7;//双游
+QgmjDef.hutime_sanyou		=8;//三游
+QgmjDef.hutime_bazhanghua	=9;//八张花
+QgmjDef.hutime_dianpao		=10;//点炮 
+QgmjDef.hutime_sanjindao	=11;//三金倒
+QgmjDef.hutime_qiangganghu	=12;//抢杠胡
+
+//胡牌类型
+QgmjDef.hutype_normal=0;//普通 
+
+QgmjDef.MajiangType={}
+QgmjDef.MajiangType.emMJType_Wan    = 1; //万
+QgmjDef.MajiangType.emMJType_Tiao   = 2; //条
+QgmjDef.MajiangType.emMJType_Tong   = 3; //筒
+QgmjDef.MajiangType.emMJType_Zi = 4; //字
+QgmjDef.MajiangType.emMJType_Hua    = 5 ; //花
+
+var COB=function(  m,   n) {
+    return m << 4 | (n & 0x0F);
+}
+let emMJ = {};
+
+emMJ.emMJ_Joker = 0;     //变后的赖子
+emMJ.emMJ_1Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 1);
+emMJ.emMJ_2Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 2);
+emMJ.emMJ_3Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 3);
+emMJ.emMJ_4Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 4);
+emMJ.emMJ_5Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 5);
+emMJ.emMJ_6Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 6);
+emMJ.emMJ_7Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 7);
+emMJ.emMJ_8Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 8);
+emMJ.emMJ_9Wan = COB(QgmjDef.MajiangType.emMJType_Wan, 9);
+
+emMJ.emMJ_1Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 1);
+emMJ.emMJ_2Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 2);
+emMJ.emMJ_3Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 3);
+emMJ.emMJ_4Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 4);
+emMJ.emMJ_5Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 5);
+emMJ.emMJ_6Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 6);
+emMJ.emMJ_7Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 7);
+emMJ.emMJ_8Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 8);
+emMJ.emMJ_9Tiao = COB(QgmjDef.MajiangType.emMJType_Tiao, 9);
+
+emMJ.emMJ_1Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 1);
+emMJ.emMJ_2Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 2);
+emMJ.emMJ_3Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 3);
+emMJ.emMJ_4Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 4);
+emMJ.emMJ_5Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 5);
+emMJ.emMJ_6Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 6);
+emMJ.emMJ_7Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 7);
+emMJ.emMJ_8Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 8);
+emMJ.emMJ_9Tong = COB(QgmjDef.MajiangType.emMJType_Tong, 9);
+
+emMJ.emMJ_DongFeng =     COB(QgmjDef.MajiangType.emMJType_Zi, 1);//东
+emMJ.emMJ_NanFeng =      COB(QgmjDef.MajiangType.emMJType_Zi, 3);//南
+emMJ.emMJ_XiFeng =       COB(QgmjDef.MajiangType.emMJType_Zi, 5);//西
+emMJ.emMJ_BeiFeng =      COB(QgmjDef.MajiangType.emMJType_Zi, 7);//北
+
+emMJ.emMJ_HongZhong =    COB(QgmjDef.MajiangType.emMJType_Zi, 9);//中
+emMJ.emMJ_FaCai =        COB(QgmjDef.MajiangType.emMJType_Zi, 11);//发
+emMJ.emMJ_BaiBan =       COB(QgmjDef.MajiangType.emMJType_Zi, 13);//白
+
+//一副中花牌各只有一张
+emMJ.emMJ_Mei =  COB(QgmjDef.MajiangType.emMJType_Hua, 1);//梅
+emMJ.emMJ_Lan =  COB(QgmjDef.MajiangType.emMJType_Hua, 3);//兰
+emMJ.emMJ_Ju =   COB(QgmjDef.MajiangType.emMJType_Hua, 5);//菊
+emMJ.emMJ_Zhu =  COB(QgmjDef.MajiangType.emMJType_Hua, 7);//竹
+emMJ.emMJ_Chun =     COB(QgmjDef.MajiangType.emMJType_Hua, 9);//春
+emMJ.emMJ_Xia =  COB(QgmjDef.MajiangType.emMJType_Hua, 11);//夏
+emMJ.emMJ_Qiu =  COB(QgmjDef.MajiangType.emMJType_Hua, 13);//秋
+emMJ.emMJ_Dong =     COB(QgmjDef.MajiangType.emMJType_Hua,15)  //冬
+QgmjDef.emMJ = emMJ;
+
+let ting_majiang_types = [
+        emMJ.emMJ_1Wan,
+        emMJ.emMJ_2Wan,
+        emMJ.emMJ_3Wan,
+        emMJ.emMJ_4Wan,
+        emMJ.emMJ_5Wan,
+        emMJ.emMJ_6Wan,
+        emMJ.emMJ_7Wan,
+        emMJ.emMJ_8Wan,
+        emMJ.emMJ_9Wan,
+
+        emMJ.emMJ_1Tiao,
+        emMJ.emMJ_2Tiao,
+        emMJ.emMJ_3Tiao,
+        emMJ.emMJ_4Tiao,
+        emMJ.emMJ_5Tiao,
+        emMJ.emMJ_6Tiao,
+        emMJ.emMJ_7Tiao,
+        emMJ.emMJ_8Tiao,
+        emMJ.emMJ_9Tiao,
+
+        emMJ.emMJ_1Tong,
+        emMJ.emMJ_2Tong,
+        emMJ.emMJ_3Tong,
+        emMJ.emMJ_4Tong,
+        emMJ.emMJ_5Tong,
+        emMJ.emMJ_6Tong,
+        emMJ.emMJ_7Tong,
+        emMJ.emMJ_8Tong,
+        emMJ.emMJ_9Tong,
+
+
+        emMJ.emMJ_DongFeng,
+        emMJ.emMJ_NanFeng,
+        emMJ.emMJ_XiFeng,
+        emMJ.emMJ_BeiFeng,
+        emMJ.emMJ_HongZhong,
+        emMJ.emMJ_FaCai,
+        emMJ.emMJ_BaiBan,
+]
+QgmjDef.ting_majiang_types = ting_majiang_types;
+//可以吃的目标增量
+QgmjDef.chiarr=[[1,2],[-1,1],[-2,-1]] 
+
+export const QgmjDef=QgmjDef;

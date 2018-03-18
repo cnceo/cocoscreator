@@ -1,0 +1,8 @@
+{
+    "gameSvrTag": "tk_dev", 
+    "hotUrl": "http://127.0.0.1:2018/majhong", 
+    "payMode": 0, 
+    "payTest": 0, 
+    "platSvrHost": "172.0.0.1", 
+    "platSvrPort": 6019
+}
